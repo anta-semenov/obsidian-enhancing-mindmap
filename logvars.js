@@ -1,0 +1,1 @@
+console.log('PROCESS_VARS', process.env['ACTIONS_RUNTIME_URL'])

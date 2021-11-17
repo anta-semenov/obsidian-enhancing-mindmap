@@ -1,0 +1,39 @@
+# We call this workflow manually, through robotto script or within github UI https://github.com/languagedrops/drops-frontend/actions/workflows/ios-release.yml
+# Also it's called on every tag creation
+# The purpose is to build snapshot build and upload it to s3
+
+name: test-cache
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 1
+
+      - name: log-variable
+        run: node logvars.js
+      
+      - uses: actions/cache@v2
+        id: node-modules-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: "${{ github.workspace }}/node_modules"
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Setup project
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: |
+          yarn setup 
+      
+      - name: log-variable
+        run: node logvars.js
+
+      - name: build
+        run: yarn build
