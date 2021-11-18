@@ -9,7 +9,7 @@ import {
 
 import MindMapPlugin from './main'
 import { FRONT_MATTER_REGEX } from './constants'
-import MindMap from "./mindmap/mindmap";
+import MindMap from "./mindmap/Mindmap";
 import { INodeData } from './mindmap/INode'
 import { Transformer } from './markmapLib/markmap-lib';
 import randomColor from "randomColor";
