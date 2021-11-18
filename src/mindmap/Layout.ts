@@ -1,5 +1,5 @@
 import Node from './INode'
-import MindMap from './mindmap';
+import MindMap from './Mindmap';
 import randomColor  from 'randomColor';
 
 export default class Layout {

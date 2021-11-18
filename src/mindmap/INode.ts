@@ -1,4 +1,4 @@
-import MindMap from './mindmap' 
+import MindMap from './Mindmap' 
 import {MarkdownRenderer,normalizePath,TFile} from 'obsidian'
 import {t} from '../lang/helpers'
 

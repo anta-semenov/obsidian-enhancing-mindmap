@@ -1,5 +1,5 @@
 import INode from './INode'
-import MindMap  from './mindmap';
+import MindMap  from './Mindmap';
 
 export abstract class Command {
     name:string;
