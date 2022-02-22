@@ -221,7 +221,6 @@ export default class MindMap {
             }
         }
         recurse(node || this.root);
-
     }
 
     getNodeById(id: string) {
@@ -315,7 +314,6 @@ export default class MindMap {
     }
 
     mindMapChange() {
-        //console.log(this.view)
         this.view?.mindMapChange();
     }
 
@@ -555,7 +553,19 @@ export default class MindMap {
                 evt.preventDefault();
                 var targetEl = evt.target as HTMLElement;
                 var href = targetEl.getAttr("href");
+
                 if(href){
+                    var firstDestination = this.view.app.metadataCache.getFirstLinkpathDest(href, this.view.file.path);
+                    console.log('++++', href, firstDestination, this.view.file)
+                    if (firstDestination?.path === this.view.file.path) {
+                        // link to internal node
+                        var subpath = href.split('#^')[1];
+                        console.log('===', subpath)
+                        if (subpath) {
+                            this.openNodeWithId(subpath);
+                            return;
+                        }
+                    }
                     this.view.app.workspace.openLinkText(
                         href,
                         this.view.file.path,
@@ -1073,22 +1083,27 @@ export default class MindMap {
         }
     }
 
-    center() {
-        this._setMindScalePointer();
+    center(node?: INode) {
+        this._setMindScalePointer(node);
         var oldScale = this.mindScale;
         this.scale(100);
 
         var w = this.containerEL.clientWidth;
         var h = this.containerEL.clientHeight;
-        this.containerEL.scrollTop = this.setting.canvasSize / 2 - h / 2 - 60;
-        this.containerEL.scrollLeft = this.setting.canvasSize / 2 - w / 2 + 30;
+        if (this.scalePointer.length) {
+            this.containerEL.scrollTop = this.scalePointer[1] - h / 2;
+            this.containerEL.scrollLeft = this.scalePointer[0] - w / 2;
+        } else {
+            this.containerEL.scrollTop = this.setting.canvasSize / 2 - h / 2 - 60;
+            this.containerEL.scrollLeft = this.setting.canvasSize / 2 - w / 2 + 30;
+        }
 
         this.scale(oldScale);
     }
 
-    _setMindScalePointer() {
+    _setMindScalePointer(node?: INode) {
         this.scalePointer = [];
-        var root = this.root;
+        var root = node || this.root;
         if (root) {
             var rbox = root.getBox();
             this.scalePointer.push(rbox.x + rbox.width / 2, rbox.y + rbox.height / 2);
@@ -1186,6 +1201,7 @@ export default class MindMap {
         }, 600);
     }
 
+<<<<<<< Updated upstream:src/mindmap/mindmap.ts
     copyNode(node?:any){
         var n = node||this.selectNode;
         if(n){
@@ -1244,5 +1260,31 @@ export default class MindMap {
         }
 
   }
+=======
+    traverseParent(node: INode, callback: (node: INode) => void) {
+        callback(node);
+        if (!node.isRoot && node.parent != null) {
+            this.traverseParent(node.parent, callback);
+        }
+    }
+
+    openNodeWithId(id: string) {
+        var snode = this.getNodeById(id);
+
+        if (snode == null) {
+            return;
+        }
+
+        if (snode.isHide) {
+            this.traverseParent(snode, (node) => {
+                if (!node.isExpand) {
+                    node.expand();
+                }
+            })
+        }
+
+        setTimeout(() => this.center(snode), 0);
+    }
+>>>>>>> Stashed changes:src/mindmap/Mindmap.ts
 
 }

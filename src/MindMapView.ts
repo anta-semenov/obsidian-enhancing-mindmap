@@ -40,6 +40,7 @@ export class MindMapView extends TextFileView implements HoverParent {
   timeOut: any = null;
   fileCache: any;
   firstInit: boolean = true;
+  subpath: string | null = null;
 
   getViewType() {
     return mindmapViewType;
@@ -230,7 +231,6 @@ export class MindMapView extends TextFileView implements HoverParent {
   }
 
   setViewData(data: string) {
-
     if (this.mindmap) {
       this.mindmap.clear();
       this.contentEl.innerHTML = '';
@@ -271,11 +271,19 @@ export class MindMapView extends TextFileView implements HoverParent {
         this.mindmap.refresh();
         this.mindmap.view = this;
         this.firstInit = false;
+        if (this.subpath) {
+          this.mindmap.openNodeWithId(this.subpath);
+          this.subpath = null;
+        }
       }, 100);
     } else {
       this.mindmap.init(this.fileCache.frontmatter.collapsedIds);
       this.mindmap.refresh();
       this.mindmap.view = this;
+      if (this.subpath) {
+        this.mindmap.openNodeWithId(this.subpath);
+        this.subpath = null;
+      }
     }
   }
 
@@ -297,7 +305,7 @@ export class MindMapView extends TextFileView implements HoverParent {
   onload() {
     super.onload();
     this.registerEvent(
-      this.app.workspace.on("quick-preview", () => this.onQuickPreview, this)
+      this.app.workspace.on("quick-preview", this.onQuickPreview, this)
     );
     this.registerEvent(
       this.app.workspace.on('resize', () => this.updateMindMap(), this)
@@ -371,6 +379,12 @@ export class MindMapView extends TextFileView implements HoverParent {
     }
   }
 
+  setEphemeralState(state: any) {
+    super.setEphemeralState(state);
+    if (state?.subpath != null) {
+      this.subpath = state.subpath.replace('^', '').replace('#', '');
+    }
+  }
 
   onMoreOptionsMenu(menu: Menu) {
     // Add a menu item to force the board to markdown view
